@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="font_863464_9sobmo6qzap/iconfont.css">
+    <link rel="stylesheet" href="../font_863464_9sobmo6qzap/iconfont.css">
+    <title>菜单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul,
+        li {
+            list-style: none;
+            cursor: pointer;
+        }
+
+        .one-menu-ul {
+            width: 250px;
+            min-height: 400px;
+            background: #ccc;
+            margin: 100px auto;
+            border: 1px solid #ccc;
+        }
+
+        li {
+            background: #fff;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .hover-div {
+            height: 40px;
+        }
+
+        div>p {
+            display: inline-block;
+        }
+
+        div>i {
+            display: inline-block;
+        }
+
+        .two-menu-ul {
+            padding-left: 30px;
+        }
+
+        p {
+            float: right;
+            font-size: 12px;
+            margin-right: 20px
+        }
+
+        .hover-div:hover {
+            background: pink
+        }
+
+        button {
+            float: right;
+        }
+
+        .cover {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .cover-tishi {
+            width: 400px;
+            height: 200px;
+            background: blue;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+
+        }
+
+        span {
+            font-size: 30px;
+
+        }
+
+        .show-li {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cover">
+        <div class="cover-tishi">
+            <p class=""><span class="yiji">0</span>-<span class="erji">0</span></p>
+            <button class="yes">是的</button>
+            <button class="no">取消</button>
+        </div>
+
+    </div>
+    <!-- <ul class="one-menu-ul">
+        <li><div>区块标题</div></li>
+        <li>
+            <div>一级标题
+                    <p>一级标题说明</p>
+                    <i class="shop shop-jiahao"></i>
+            </div>
+            
+            
+            <ul class="two-menu-ul" >
+                <li>
+                    <div>二级标题
+                            <p>二级标题说明</p>
+                            button 
+                    </div>
+
+                </li>
+                <li>
+                        <div>二级标题
+                                <p>二级标题说明</p>
+                                <i class="shop shop-dui"></i>
+                        </div>
+
+                </li>
+            </ul>
+
+        </li>
+    </ul> -->
+    <script src="jquery.js"></script>
+    <script>
+
+        var menu = (function () {
+            return {
+                init: function () {
+                    this.$body = document.querySelector('body')
+                    this.$Ibefore = document.querySelector('.Ibefore');
+                    this.getJSON();
+                    this.event();
+                },
+                event: function () {
+                    var _this = this;
+
+                },
+                getJSON: function () {
+                    var _this = this;
+                    $.getJSON('http://localhost:8888/111kaoshi/menu.json', function (data) {
+                        _this.pushList(data);
+                    })
+                },
+                pushList: function (data) {
+                    data = data[0];
+                    var name = data.name;
+                    var arr = data.child;
+                    console.log(arr);
+                    var $one_menu_ul = document.createElement('ul');
+                    this.$body.appendChild($one_menu_ul);
+                    $one_menu_ul.className = 'one-menu-ul';
+                    var $li = document.createElement('li');
+                    var $div = document.createElement('div');
+                    $div.className = 'hover-div';
+                    $div.innerHTML = name;
+                    $one_menu_ul.appendChild($li);
+                    $li.appendChild($div);
+                    for (var i = 0; i < arr.length; i++) {
+                        $li = document.createElement('li');
+                        $div = document.createElement('div');
+                        $div.className = 'hover-div';
+                        $div.innerHTML = arr[i].name;
+                        var $p = document.createElement('p');
+                        $p.innerHTML = arr[i].content;
+                        //console.log($p.innerHTML)
+                        $li.appendChild($div);
+                        $div.appendChild($p);
+                        var $two_menu_ul = document.createElement('ul')
+
+                        $two_menu_ul.className = 'two-menu-ul';
+                        $li.appendChild($two_menu_ul);
+                        $two_menu_ul.style.display = 'none';
+                        $one_menu_ul.appendChild($li)
+                        for (var j = 0; j < arr[i].child.length; j++) {
+                            $li = document.createElement('li');
+                            $div = document.createElement('div');
+                            $div.className = 'hover-div';
+                            $div.innerHTML = arr[i].child[j].name;
+                            $p = document.createElement('p');
+                            $p.innerHTML = arr[i].child[j].content;
+                            var $btn = document.createElement('button')
+                            $btn.innerHTML = '移除';
+                            $div.appendChild($btn);
+                            $li.appendChild($div);
+                            $div.appendChild($p);
+
+                            $two_menu_ul.appendChild($li);
+                        }
+                    }
+
+                },
+            }
+        }())
+        menu.init();
+
+
+        $(function () {
+            $('li').on('click', 'div', function () {
+                $(this).siblings().stop().slideToggle();
+            })
+            $('button').click(function () {
+                var _this = this;
+                $('.yiji').html($(this).parent().parent().parent().parent().index());
+                $('.erji').html($(this).parent().parent().index())
+                $('.cover').css('display', "block");
+                $(".yes").click(function () {
+                    $('.cover').css('display', "none")
+                    $(_this).parent().parent().remove();
+                })
+                $(".no").click(function () {
+                    $('.cover').css('display', "none")
+                })
+
+            })
+
+            $('li').each(function () {
+                //console.log($(this).index());
+                if ($(this).index() > 1) {
+                    $(this).css('display', "none");
+                    $(this).nextAll().css('display', "none");
+                    $('<li>剩余标签......</li>').addClass('show-li').appendTo($(this).parent()[0]);
+                }
+            })
+            $('.show-li').click(function () {
+                $(this).siblings().slideDown();
+                $(this).css('display', "none");
+            })
+        })
+
+
+    </script>
+
+</body>
+
+</html>
